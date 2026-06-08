@@ -65,39 +65,50 @@ def create_comb_maze(width: int = 15, height: int = 15) -> MazeGrid:
 
 def create_astar_trap_maze(width: int = 15, height: int = 15) -> MazeGrid:
     """
-    Create a maze where the goal appears close by Manhattan distance,
+    Create a solvable maze where the goal appears close by Manhattan distance,
     but a wall forces a detour.
 
     Structure:
     - Start is near the upper-left.
     - Goal is near the upper-right.
-    - A horizontal wall blocks the direct route.
-    - The only passage is far away, near the bottom.
+    - The direct upper route is blocked.
+    - The only valid route goes down, across the bottom area, and back up.
 
     Purpose:
     - Tests heuristic deception.
-    - A* and Greedy may spend effort near the blocked goal-facing region.
+    - Greedy Best-First Search may be attracted toward the goal-facing region.
+    - A* may also expand extra nodes depending on tie-breaking.
     """
     if width < 9 or height < 9:
         raise ValueError("A* trap maze requires width and height >= 9.")
 
     grid = [[0 for _ in range(width)] for _ in range(height)]
 
-    wall_row = 2
-
-    # Horizontal wall, leaving only a far passage at the left edge
-    for col in range(1, width):
-        grid[wall_row][col] = 1
-
-    # Add a vertical blocking wall near the goal side to make the direct region worse
-    block_col = width - 3
-    for row in range(0, wall_row):
-        grid[row][block_col] = 1
-
     start = (0, 0)
     goal = (0, width - 1)
 
-    # Ensure start and goal are free
+    # Create a vertical wall close to the goal, blocking the direct top route.
+    wall_col = width - 3
+    for row in range(0, height - 2):
+        grid[row][wall_col] = 1
+
+    # Create a horizontal wall below the top area, forcing a larger detour.
+    wall_row = 2
+    for col in range(1, width - 1):
+        grid[wall_row][col] = 1
+
+    # Open passages that keep the maze solvable.
+    # Left passage lets the start reach the lower area.
+    grid[wall_row][0] = 0
+
+    # Bottom passage around the vertical wall.
+    grid[height - 2][wall_col] = 0
+
+    # Right-side upward passage to reach the goal.
+    for row in range(0, height):
+        grid[row][width - 1] = 0
+
+    # Ensure start and goal are free.
     grid[start[0]][start[1]] = 0
     grid[goal[0]][goal[1]] = 0
 
