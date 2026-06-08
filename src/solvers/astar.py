@@ -31,7 +31,8 @@ def solve_astar(maze: MazeGrid) -> SolverResult:
     max_frontier_size = len(frontier)
 
     while frontier:
-        _, current_cost, current = heappop(frontier)
+        _, neg_current_cost, current = heappop(frontier)
+        current_cost = -neg_current_cost
         expanded_nodes += 1
 
         if current == maze.goal:
@@ -45,7 +46,7 @@ def solve_astar(maze: MazeGrid) -> SolverResult:
                 came_from[neighbor] = current
 
                 priority = new_cost + manhattan_distance(neighbor, maze.goal)
-                heappush(frontier, (priority, new_cost, neighbor))
+                heappush(frontier, (priority, -new_cost, neighbor))
 
         max_frontier_size = max(max_frontier_size, len(frontier))
 
