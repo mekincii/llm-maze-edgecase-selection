@@ -6,6 +6,7 @@ from src.maze.edge_cases import (
     create_astar_trap_maze,
     create_comb_maze,
     create_dfs_trap_maze,
+    create_greedy_trap_maze,
     create_open_maze,
 )
 from src.maze.grid import MazeGrid
@@ -27,6 +28,7 @@ def get_maze_cases() -> list[tuple[str, MazeFactory]]:
         ("COMB", create_comb_maze),
         ("ASTAR_TRAP", create_astar_trap_maze),
         ("DFS_TRAP", create_dfs_trap_maze),
+        ("GREEDY_TRAP", create_greedy_trap_maze),
     ]
 
 

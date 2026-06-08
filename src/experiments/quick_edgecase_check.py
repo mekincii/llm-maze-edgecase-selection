@@ -4,6 +4,7 @@ from src.maze.edge_cases import (
     create_astar_trap_maze,
     create_comb_maze,
     create_dfs_trap_maze,
+    create_greedy_trap_maze,
     create_open_maze,
 )
 from src.maze.grid import MazeGrid
@@ -106,6 +107,7 @@ def main() -> None:
         ("Comb maze", create_comb_maze),
         ("A* trap maze", create_astar_trap_maze),
         ("DFS trap maze", create_dfs_trap_maze),
+        ("Greedy trap maze", create_greedy_trap_maze),
     ]
 
     for name, factory in cases:
