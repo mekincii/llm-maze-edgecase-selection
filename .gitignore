@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# PyCharm
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data outputs
+data/generated/
+data/results/
+figures/mazes/
+figures/paths/
+figures/paper/
+
+!data/generated/.gitkeep
+!data/results/.gitkeep
+!figures/mazes/.gitkeep
+!figures/paths/.gitkeep
+!figures/paper/.gitkeep
+
+# Environment / secrets
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db

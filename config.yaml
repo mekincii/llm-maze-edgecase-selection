@@ -1,0 +1,15 @@
+project:
+  name: llm-maze-edgecase-selection
+  seed: 42
+
+maze:
+  default_width: 15
+  default_height: 15
+  wall_symbol: "#"
+  free_symbol: "."
+  start_symbol: "S"
+  goal_symbol: "G"
+
+experiments:
+  output_dir: data/results
+  figure_dir: figures
