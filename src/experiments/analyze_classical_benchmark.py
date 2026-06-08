@@ -43,6 +43,58 @@ def summarize_solver_performance(df: pd.DataFrame) -> None:
     print(summary.to_string(index=False))
 
 
+def summarize_shortest_path_reliability(df: pd.DataFrame) -> None:
+    print_section("Shortest-path reliability by solver")
+
+    summary = (
+        df.groupby("solver_name")
+        .agg(
+            total_cases=("solver_name", "count"),
+            success_count=("success", "sum"),
+            shortest_path_count=("is_shortest_path", "sum"),
+            avg_expanded_nodes=("expanded_nodes", "mean"),
+        )
+        .reset_index()
+    )
+
+    summary["success_rate"] = summary["success_count"] / summary["total_cases"]
+    summary["shortest_path_rate"] = (
+        summary["shortest_path_count"] / summary["total_cases"]
+    )
+
+    shortest_only = df[df["is_shortest_path"] == True]
+
+    avg_expansion_shortest = (
+        shortest_only.groupby("solver_name")
+        .agg(avg_expanded_when_shortest=("expanded_nodes", "mean"))
+        .reset_index()
+    )
+
+    summary = summary.merge(
+        avg_expansion_shortest,
+        on="solver_name",
+        how="left",
+    )
+
+    summary = summary[
+        [
+            "solver_name",
+            "total_cases",
+            "success_count",
+            "success_rate",
+            "shortest_path_count",
+            "shortest_path_rate",
+            "avg_expanded_nodes",
+            "avg_expanded_when_shortest",
+        ]
+    ].sort_values(
+        ["shortest_path_rate", "avg_expanded_when_shortest"],
+        ascending=[False, True],
+    )
+
+    print(summary.to_string(index=False))
+
+
 def summarize_by_maze_family(df: pd.DataFrame) -> None:
     print_section("Solver performance by maze family")
 
@@ -139,6 +191,7 @@ def main() -> None:
     print(f"Loaded {len(df)} rows from {BENCHMARK_PATH}")
 
     summarize_solver_performance(df)
+    summarize_shortest_path_reliability(df)
     summarize_by_maze_family(df)
     summarize_best_optimal_solvers(df)
     summarize_raw_vs_optimal_conflicts(df)
