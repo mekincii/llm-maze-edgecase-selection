@@ -63,10 +63,33 @@ def run_maze_case(name: str, factory: MazeFactory, width: int, height: int) -> N
             key=lambda result: result.expanded_nodes,
         )
 
+        shortest_path_length = min(
+            result.path_length for result in successful_results
+        )
+
+        optimal_results = [
+            result
+            for result in successful_results
+            if result.path_length == shortest_path_length
+        ]
+
+        best_optimal_by_expansion = min(
+            optimal_results,
+            key=lambda result: result.expanded_nodes,
+        )
+
         print(
-            f"Best by expanded nodes: "
+            f"Best by raw expanded nodes: "
             f"{best_by_expansion.solver_name} "
-            f"({best_by_expansion.expanded_nodes} expanded)"
+            f"({best_by_expansion.expanded_nodes} expanded, "
+            f"path={best_by_expansion.path_length})"
+        )
+
+        print(
+            f"Best among shortest-path solvers: "
+            f"{best_optimal_by_expansion.solver_name} "
+            f"({best_optimal_by_expansion.expanded_nodes} expanded, "
+            f"path={best_optimal_by_expansion.path_length})"
         )
     else:
         print("No solver found a valid path for this maze.")
