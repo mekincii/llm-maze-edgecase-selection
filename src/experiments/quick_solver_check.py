@@ -1,7 +1,10 @@
 from src.maze.grid import MazeGrid
+from src.solvers.astar import solve_astar
 from src.solvers.bfs import solve_bfs
-from src.solvers.dfs import solve_dfs
 from src.solvers.common import SolverResult
+from src.solvers.dfs import solve_dfs
+from src.solvers.dijkstra import solve_dijkstra
+from src.solvers.greedy import solve_greedy_best_first
 
 
 def print_result(result: SolverResult, maze: MazeGrid) -> None:
@@ -37,11 +40,17 @@ def main() -> None:
     print(maze.to_ascii())
     print()
 
-    bfs_result = solve_bfs(maze)
-    dfs_result = solve_dfs(maze)
+    solvers = [
+        solve_bfs,
+        solve_dfs,
+        solve_dijkstra,
+        solve_astar,
+        solve_greedy_best_first,
+    ]
 
-    print_result(bfs_result, maze)
-    print_result(dfs_result, maze)
+    for solver in solvers:
+        result = solver(maze)
+        print_result(result, maze)
 
 
 if __name__ == "__main__":
