@@ -50,7 +50,7 @@ Implement the first classical pathfinding solvers and create initial edge-case m
 ### Observations
 - In the open maze, BFS and Dijkstra expanded all 225 cells, while A*, Greedy, and DFS expanded only 29 after A* tie-breaking was improved.
 - In the DFS trap maze, DFS found a valid but much longer path than the shortest-path solvers.
-- In the A* trap maze, heuristic methods still found shortest paths but expanded many nodes, showing heuristic degradation.
+- In the A* trap maze, heuristic methods still found the shortest paths but expanded many nodes, showing heuristic degradation.
 - Raw expanded-node count alone can be misleading because DFS may expand fewer nodes while returning a non-shortest path.
 
 ### Methodological decision
@@ -68,3 +68,50 @@ For LLM-based solver selection, the main oracle should probably be the best solv
 - Update edge-case reporting to show both raw best solver and best shortest-path solver.
 - Add automated tests to ensure every edge-case generator produces a solvable maze.
 - Later, save benchmark results to CSV for analysis.
+
+## 2026-06-08 — Classical Benchmark Logging
+
+### Goal
+Move from quick printed checks to machine-readable benchmark output.
+
+### Work completed
+- Added `run_classical_benchmark.py`.
+- The script evaluates all current maze families with all current solvers.
+- Results are saved to `data/results/classical_benchmark.csv`.
+
+### Current benchmark scope
+- Maze families:
+  - OPEN
+  - COMB
+  - ASTAR_TRAP
+  - DFS_TRAP
+- Solvers:
+  - BFS
+  - DFS
+  - Dijkstra
+  - A*
+  - Greedy Best-First Search
+- Maze size:
+  - 15x15
+
+### Logged metrics
+- Success
+- Path length
+- Expanded nodes
+- Visited nodes
+- Maximum frontier size
+- Runtime in milliseconds
+- Shortest-path status
+- Best raw expansion status
+- Best optimal expansion status
+- Raw expansion regret
+- Optimal expansion regret
+
+### Methodological note
+The benchmark distinguishes between the solver with the lowest raw expansion and the solver with the lowest expansion among shortest-path solvers. This is necessary because DFS may expand fewer nodes while returning a longer non-optimal path.
+
+### Next steps
+- Add visualization/analysis script for the CSV.
+- Extend benchmark to multiple maze sizes.
+- Add more edge-case maze families.
+
