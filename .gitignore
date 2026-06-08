@@ -17,17 +17,19 @@ env/
 .ipynb_checkpoints/
 
 # Data outputs
-data/generated/
-data/results/
-figures/mazes/
-figures/paths/
-figures/paper/
+data/generated/*
+data/results/*
+figures/mazes/*
+figures/paths/*
+figures/papers/*
 
+# But keep folder structure
 !data/generated/.gitkeep
 !data/results/.gitkeep
+!data/prompts/.gitkeep
 !figures/mazes/.gitkeep
 !figures/paths/.gitkeep
-!figures/paper/.gitkeep
+!figures/papers/.gitkeep
 
 # Environment / secrets
 .env
