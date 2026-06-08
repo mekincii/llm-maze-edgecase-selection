@@ -115,3 +115,23 @@ The benchmark distinguishes between the solver with the lowest raw expansion and
 - Extend benchmark to multiple maze sizes.
 - Add more edge-case maze families.
 
+## 2026-06-08 — Decision to Add ASCII-Based Maze Templates
+
+### Context
+The initial edge-case maze generators were implemented procedurally using Python loops. This approach worked for several cases, including the open maze, comb maze, A* trap maze, and DFS trap maze. However, attempts to design a Greedy Best-First Search trap showed that procedural construction can make edge-case structure difficult to inspect and control.
+
+The current Greedy trap maze is valid and solvable, but it does not yet expose Greedy Best-First Search weakness. In the latest quick edge-case check, Greedy Best-First Search still found the shortest path and expanded the fewest nodes. This means the generated structure still contains a heuristic-friendly route that is also genuinely optimal.
+
+### Observation
+The project now needs more precise control over handcrafted maze layouts. For diagnostic edge cases, visual readability of the maze structure is important. A maze designed to test a specific failure mode should be easy to inspect, reproduce, and explain in the paper.
+
+### Decision
+Add an ASCII-based maze template loader before redesigning the Greedy trap maze.
+
+The loader will convert templates such as:
+
+```text
+#######
+#S...G#
+#######
+
