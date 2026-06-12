@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 from collections.abc import Callable
+from dataclasses import asdict
 
 from src.maze.edge_cases import (
     create_astar_trap_maze,
@@ -16,6 +17,7 @@ from src.solvers.common import SolverResult
 from src.solvers.dfs import solve_dfs
 from src.solvers.dijkstra import solve_dijkstra
 from src.solvers.greedy import solve_greedy_best_first
+from src.maze.features import extract_maze_features
 
 
 MazeFactory = Callable[[int, int], MazeGrid]
@@ -50,6 +52,12 @@ def evaluate_maze(
 ) -> list[dict[str, object]]:
     solvers = get_solvers()
     results = [solver(maze) for solver in solvers]
+
+    features = extract_maze_features(maze)
+    feature_dict = {
+        f"feature_{key}": value
+        for key, value in asdict(features).items()
+    }
 
     successful_results = [result for result in results if result.success]
 
@@ -124,6 +132,7 @@ def evaluate_maze(
                 "is_best_optimal_expansion": is_best_optimal_expansion,
                 "raw_expansion_regret": raw_expansion_regret,
                 "optimal_expansion_regret": optimal_expansion_regret,
+                **feature_dict,
             }
         )
 
