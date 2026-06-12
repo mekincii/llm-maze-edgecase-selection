@@ -235,4 +235,32 @@ For the course-paper phase, the edge-case suite v0.1 is considered fixed. Future
 
 Proceed to the LLM prompt-builder phase. The first prompt format will use the feature-enriched benchmark representation and ask the LLM to classify the edge case and recommend a solver under a shortest-path-aware efficiency objective.
 
+## 2026-06-12 — LLM Prompt and Response Validation Layer
+
+### Goal
+Create a controlled LLM-facing interface for solver-selection experiments.
+
+### Work completed
+- Added a prompt builder with three representation modes:
+  - `features`
+  - `ascii`
+  - `features_ascii`
+- Added a methodological switch to exclude shortest-path-derived features by default.
+- Added an LLM response parser for strict JSON outputs.
+- Added validation for:
+  - allowed edge-case classes
+  - allowed solver names
+  - confidence values between 0.0 and 1.0
+  - non-empty explanation strings
+- Confirmed that all tests pass.
+
+### Methodological importance
+The LLM is treated as a meta-level classifier and solver selector, not as a direct maze solver. The response parser ensures that LLM outputs can be evaluated consistently and rejected when malformed.
+
+### Current pipeline
+`Maze → Feature/ASCII representation → Prompt → LLM JSON response → Parser → Validated decision`
+
+### Next step
+Add an LLM selection evaluation script that compares validated LLM decisions against the oracle labels from the classical benchmark.
+
 
