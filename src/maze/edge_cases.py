@@ -1,4 +1,5 @@
 from src.maze.grid import MazeGrid
+from src.maze.ascii_loader import maze_from_ascii
 
 
 def create_open_maze(width: int = 15, height: int = 15) -> MazeGrid:
@@ -170,68 +171,47 @@ def create_dfs_trap_maze(width: int = 15, height: int = 15) -> MazeGrid:
 
 def create_greedy_trap_maze(width: int = 15, height: int = 15) -> MazeGrid:
     """
-    Create a maze intended to expose Greedy Best-First Search weakness.
+    Create a maze intended to expose Greedy Best-First Search expansion weakness.
+
+    This handcrafted diagnostic case uses an ASCII template for precise control.
 
     Structure:
-    - Start is on the left side.
-    - Goal is on the right side.
-    - There are two valid routes:
-        1. A short route that initially moves away from the goal.
-        2. A longer route that appears closer to the goal according to
-           Manhattan distance.
-    - Greedy Best-First Search may prefer the misleading route because it
-      only considers heuristic distance and ignores accumulated path cost.
+    - The maze contains heuristic-attractive regions near the goal.
+    - Greedy Best-First Search is expected to explore these regions because it
+      only considers Manhattan distance to the goal.
+    - A* is expected to be less affected because it considers both accumulated
+      path cost and heuristic distance.
+
+    Expected behavior:
+    - BFS, Dijkstra, A*, and Greedy Best-First Search should find the shortest path.
+    - Greedy Best-First Search is expected to expand more nodes than A*.
+    - This is an expansion-efficiency trap, not necessarily an optimality trap.
 
     Purpose:
-    - Tests whether a heuristic-only solver can return a non-shortest path.
+    - Tests whether a heuristic-only solver can become inefficient even when it
+      still finds a shortest path.
     """
-    if width < 15 or height < 15:
-        raise ValueError("Greedy trap maze requires width and height >= 15.")
+    if width != 15 or height != 15:
+        raise ValueError(
+            "This handcrafted Greedy trap currently requires width=15 and height=15."
+        )
 
-    grid = [[1 for _ in range(width)] for _ in range(height)]
-
-    start = (height // 2, 1)
-    goal = (height // 2, width - 2)
-
-    start_row = start[0]
-
-    # Misleading upper route: moves toward the goal early, but takes a long detour.
-    for col in range(1, width - 2):
-        grid[start_row][col] = 0
-
-    for row in range(1, start_row + 1):
-        grid[row][width - 3] = 0
-
-    for col in range(2, width - 2):
-        grid[1][col] = 0
-
-    for row in range(1, height - 2):
-        grid[row][2] = 0
-
-    for col in range(2, width - 1):
-        grid[height - 2][col] = 0
-
-    for row in range(start_row, height - 1):
-        grid[row][width - 2] = 0
-
-    # Shorter lower route: initially moves away from the goal, then reaches it.
-    lower_row = start_row + 2
-
-    for row in range(start_row, lower_row + 1):
-        grid[row][1] = 0
-
-    for col in range(1, width - 1):
-        grid[lower_row][col] = 0
-
-    for row in range(start_row, lower_row + 1):
-        grid[row][width - 2] = 0
-
-    # Ensure start and goal are free.
-    grid[start[0]][start[1]] = 0
-    grid[goal[0]][goal[1]] = 0
-
-    return MazeGrid(
-        grid=grid,
-        start=start,
-        goal=goal,
+    return maze_from_ascii(
+        """
+        ###############
+        ###############
+        ###############
+        ###############
+        ####..........#
+        ####........###
+        ###########.#.#
+        #S..........#G#
+        #.###########.#
+        #.............#
+        ###############
+        ###############
+        ###############
+        ###############
+        ###############
+        """
     )
