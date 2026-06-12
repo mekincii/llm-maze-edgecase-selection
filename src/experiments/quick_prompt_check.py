@@ -11,16 +11,28 @@ def main() -> None:
         ("GREEDY_TRAP", create_greedy_trap_maze),
     ]
 
+    representation_modes = [
+        "features",
+        "ascii",
+        "features_ascii",
+    ]
+
     for name, factory in cases:
-        print("=" * 90)
-        print(name)
-        print("=" * 90)
-
         maze = factory(width=15, height=15)
-        prompt = build_prompt_for_maze(maze, include_ascii=True)
 
-        print(prompt)
-        print()
+        for mode in representation_modes:
+            print("=" * 90)
+            print(f"{name} | representation_mode={mode}")
+            print("=" * 90)
+
+            prompt = build_prompt_for_maze(
+                maze,
+                representation_mode=mode,
+                include_solution_features=False,
+            )
+
+            print(prompt)
+            print()
 
 
 if __name__ == "__main__":
