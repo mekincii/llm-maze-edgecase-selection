@@ -179,4 +179,60 @@ The next phase is to build the LLM-facing layer. The first step will be a prompt
 * Add a quick prompt inspection script.
 * Later, add LLM response parsing and selector evaluation.
 
+## 2026-06-12 — Edge-Case Suite Rationale and Literature Positioning
+
+### Goal
+
+Document why the initial edge-case maze suite was selected before moving to LLM prompt generation.
+
+### Current Edge-Case Suite
+
+The first experimental suite is fixed as `Edge-case suite v0.1` and contains:
+
+* `OPEN`
+* `COMB`
+* `ASTAR_TRAP`
+* `DFS_TRAP`
+* `GREEDY_TRAP`
+
+These cases are controlled synthetic diagnostic mazes, not random benchmark maps.
+
+### Rationale
+
+The suite was designed to expose different solver behaviors:
+
+1. `OPEN` acts as a baseline case with no obstacles. It highlights broad expansion by uninformed shortest-path methods such as BFS/Dijkstra compared with more goal-directed methods.
+
+2. `COMB` introduces repeated branches and dead-end-like structures. It is intended to test how solvers behave in corridor/branch-heavy environments.
+
+3. `ASTAR_TRAP` creates a heuristic-deception situation where the Manhattan distance between start and goal is much smaller than the true shortest path length. This tests how A* and Greedy Best-First Search behave when the heuristic is structurally misleading.
+
+4. `DFS_TRAP` tests DFS sensitivity to traversal order and its lack of shortest-path guarantees. The behavior test confirms that DFS returns a longer path than BFS on this maze.
+
+5. `GREEDY_TRAP` is defined as an expansion-efficiency trap rather than an optimality trap. Greedy Best-First Search still finds a shortest path, but expands more nodes than A*, demonstrating that heuristic-only prioritization can be inefficient.
+
+### Literature Positioning
+
+The suite is motivated by three bodies of work:
+
+1. Grid-based pathfinding benchmarks, especially MovingAI/Sturtevant-style 2D grid benchmarks, which motivate using controlled grid maps, fixed start-goal pairs, and reproducible pathfinding instances.
+
+2. Classical graph search literature, including Dijkstra’s shortest-path algorithm and A* heuristic search. These justify including Dijkstra, BFS, A*, and Greedy Best-First Search as classical baselines.
+
+3. Recent LLM path-planning research, especially hybrid approaches such as LLM-A* and maze-navigation benchmarks such as MazeEval. These motivate using LLMs as meta-level reasoning or solver-selection modules rather than direct path solvers.
+
+### Methodological Decision
+
+For the course-paper phase, the edge-case suite v0.1 is considered fixed. Future work may expand it with:
+
+* parameterized variants,
+* larger grid sizes,
+* MovingAI-style external maps,
+* weighted terrain,
+* additional solvers such as Bidirectional BFS.
+
+### Next Step
+
+Proceed to the LLM prompt-builder phase. The first prompt format will use the feature-enriched benchmark representation and ask the LLM to classify the edge case and recommend a solver under a shortest-path-aware efficiency objective.
+
 
