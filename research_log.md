@@ -135,3 +135,48 @@ The loader will convert templates such as:
 #S...G#
 #######
 
+## 2026-06-12 — Feature-Enriched Benchmark and Transition to LLM Prompting
+
+### Goal
+
+Extend the classical benchmark output with structural maze features so that the same dataset can support both classical analysis and later LLM-based solver-selection experiments.
+
+### Work completed
+
+* Added maze feature extraction in `src/maze/features.py`.
+* Added tests for feature extraction.
+* Added `quick_feature_check.py` for inspecting structural features of each maze family.
+* Updated `run_classical_benchmark.py` so each benchmark row now includes `feature_*` columns.
+* Confirmed that the benchmark still generates 25 rows:
+
+  * 5 maze families
+  * 5 solvers
+* Confirmed that the analysis script still works after adding feature columns.
+* Confirmed that all tests pass.
+
+### Methodological importance
+
+The benchmark now combines solver-performance metrics with structural maze descriptors. This makes the dataset suitable for LLM prompting, because an LLM can be given a feature summary rather than only a raw ASCII grid.
+
+### Current interpretation
+
+The project has completed the initial classical foundation:
+
+* maze representation
+* classical solvers
+* edge-case generators
+* validity and behavior tests
+* benchmark logging
+* analysis
+* feature extraction
+
+The next phase is to build the LLM-facing layer. The first step will be a prompt builder that converts maze features, and optionally ASCII layouts, into structured prompts asking an LLM to classify the edge case and recommend a solver.
+
+### Next steps
+
+* Add `src/llm/prompt_builder.py`.
+* Add prompt-builder tests.
+* Add a quick prompt inspection script.
+* Later, add LLM response parsing and selector evaluation.
+
+
