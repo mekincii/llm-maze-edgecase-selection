@@ -494,3 +494,170 @@ This will allow a second experiment comparing:
 * Run the same Ollama model set on the new prompt dataset.
 * Compare v1 and v2 results to test whether explicit edge-case definitions improve classification without harming solver-selection performance.
 
+## 2026-06-18 — Prompt v3 Operational Guidance Experiment
+
+### Goal
+
+Test whether operational prompt guidance improves LLM-based edge-case classification and solver selection compared with earlier prompt versions.
+
+Prompt v3 extends the previous prompt designs by adding:
+
+* edge-case definitions,
+* observable edge-case cues,
+* solver-selection guidance,
+* warnings against assuming BFS or Dijkstra minimize node expansions simply because they guarantee shortest paths.
+
+### Work completed
+
+* Added prompt v3 with operational guidance.
+* Generated `data/prompts/llm_prompts_v3_operational.csv`.
+* Confirmed the full test suite passes with 97 tests.
+* Committed and pushed the prompt v3 implementation.
+* Ran the full Ollama response generation pipeline:
+
+  * 5 maze families,
+  * 3 representation modes,
+  * 3 Qwen3 local models,
+  * 45 total LLM responses.
+* Evaluated the v3 responses with the existing response-file evaluation pipeline.
+* Ran the LLM result-analysis script.
+
+### Prompt versions compared
+
+* v1: label list only.
+* v2: edge-case definitions.
+* v3: edge-case definitions + observable cues + solver-selection guidance.
+
+### Main v3 results
+
+Overall v3 results:
+
+* Classification accuracy: 0.400
+* Empirical solver-selection accuracy: 0.511
+* Guarantee-aware solver-selection accuracy: 0.889
+* Shortest-path rate: 1.000
+* Quality failure rate: 0.000
+* Guarantee-aware policy violation rate: 0.000
+* Average empirical expansion regret: 23.200
+* Average guarantee-aware expansion delta: 10.000
+
+### Comparison against previous prompts
+
+Prompt v3 produced the best overall solver-selection performance.
+
+Compared with v1 and v2:
+
+* v3 improved classification over v1.
+* v3 improved solver-selection over both v1 and v2.
+* v3 strongly reduced expansion regret/delta.
+* v3 preserved perfect shortest-path rate and zero quality failures.
+
+Approximate overall comparison:
+
+| Prompt version | Classification accuracy | Empirical solver-selection accuracy | Guarantee-aware solver-selection accuracy | Avg empirical expansion regret | Avg guarantee-aware expansion delta |
+| -------------- | ----------------------: | ----------------------------------: | ----------------------------------------: | -----------------------------: | ----------------------------------: |
+| v1 labels only |                   0.222 |                               0.356 |                                     0.600 |                         41.978 |                              28.778 |
+| v2 definitions |                   0.378 |                               0.244 |                                     0.467 |                         48.089 |                              34.889 |
+| v3 operational |                   0.400 |                               0.511 |                                     0.889 |                         23.200 |                              10.000 |
+
+### Model-level findings
+
+Prompt v3 produced clear model-level differences:
+
+* `qwen3:1.7b`
+
+  * Classification accuracy: 0.400
+  * Empirical solver-selection accuracy: 0.333
+  * Guarantee-aware solver-selection accuracy: 0.667
+  * The model improved substantially compared with earlier prompts, but still selected BFS in several cases.
+
+* `qwen3:4b`
+
+  * Classification accuracy: 0.467
+  * Empirical solver-selection accuracy: 0.600
+  * Guarantee-aware solver-selection accuracy: 1.000
+  * This was the best classification performer and achieved perfect guarantee-aware solver selection.
+
+* `qwen3:8b`
+
+  * Classification accuracy: 0.333
+  * Empirical solver-selection accuracy: 0.600
+  * Guarantee-aware solver-selection accuracy: 1.000
+  * The model remained extremely stable for solver recommendation, always selecting A*.
+
+### Representation-level findings
+
+Prompt v3 showed that representation effects are not straightforward:
+
+* `ascii`
+
+  * Classification accuracy: 0.467
+  * Guarantee-aware solver-selection accuracy: 0.933
+
+* `features`
+
+  * Classification accuracy: 0.267
+  * Guarantee-aware solver-selection accuracy: 0.933
+
+* `features_ascii`
+
+  * Classification accuracy: 0.467
+  * Guarantee-aware solver-selection accuracy: 0.800
+
+The combined `features_ascii` representation was not always best under the longer v3 prompt. This may indicate that longer prompts plus multiple representations can increase cognitive load or ambiguity for smaller local models.
+
+### Maze-family findings
+
+Prompt v3 improved several categories but some diagnostic classes remained difficult.
+
+* `OPEN`
+
+  * Classification accuracy: 1.000
+  * Guarantee-aware solver-selection accuracy: 0.778
+
+* `COMB`
+
+  * Classification accuracy: 0.667
+  * Guarantee-aware solver-selection accuracy: 1.000
+
+* `ASTAR_TRAP`
+
+  * Classification accuracy: 0.333
+  * Guarantee-aware solver-selection accuracy: 0.889
+
+* `DFS_TRAP`
+
+  * Classification accuracy: 0.000
+  * Guarantee-aware solver-selection accuracy: 0.778
+
+* `GREEDY_TRAP`
+
+  * Classification accuracy: 0.000
+  * Guarantee-aware solver-selection accuracy: 1.000
+
+The key insight is that LLMs can make good solver recommendations even when they fail to assign the correct diagnostic edge-case label.
+
+### Main interpretation
+
+Prompt v3 supports the central finding of the project:
+
+LLMs are better at conservative, guarantee-aware solver selection than at precise custom edge-case classification.
+
+Operational guidance is especially important. Generic edge-case definitions alone improved classification but weakened solver selection. Operational guidance corrected this by making the solver objective clearer and explicitly warning against confusing shortest-path reliability with expansion efficiency.
+
+### Current research conclusion
+
+The experimental core is now complete enough for a course paper or seminar paper.
+
+The strongest claim is:
+
+Operational prompt guidance substantially improves local LLM performance as a guarantee-aware solver selector for controlled maze pathfinding edge cases, even though classification of algorithm-behavior traps such as `DFS_TRAP` and `GREEDY_TRAP` remains difficult.
+
+### Next steps
+
+* Create a compact v1/v2/v3 comparison table for the paper.
+* Produce figures from the summary CSV files.
+* Write the paper outline.
+* Draft the methodology section.
+* Draft the results and discussion sections around the v1/v2/v3 prompt ablation.
+
