@@ -8,6 +8,12 @@ from src.llm.response_parser import parse_llm_selection_response
 
 BENCHMARK_PATH = Path("data/results/classical_benchmark.csv")
 
+GUARANTEED_SHORTEST_PATH_SOLVERS = {
+    "BFS",
+    "Dijkstra",
+    "A*",
+}
+
 
 def load_classical_benchmark(path: Path = BENCHMARK_PATH) -> pd.DataFrame:
     if not path.exists():
@@ -24,11 +30,14 @@ def get_oracle_solvers(
     maze_family: str,
 ) -> set[str]:
     """
-    Return solvers that are oracle-best for the given maze family.
+    Return empirical oracle solvers for the given maze family.
 
-    Oracle definition:
-    Among solvers that find a shortest path, choose those with the
-    lowest expanded-node count.
+    Empirical oracle definition:
+    Among all solvers that find a shortest path, choose those with the
+    lowest expanded-node count on this exact instance.
+
+    This oracle may select non-guaranteed solvers such as DFS if they happen
+    to find a shortest path with fewer expansions on a specific maze.
     """
     family_df = benchmark_df[benchmark_df["maze_family"] == maze_family]
 
@@ -39,6 +48,47 @@ def get_oracle_solvers(
 
     if oracle_df.empty:
         raise ValueError(f"No oracle solver found for maze family: {maze_family}")
+
+    return set(oracle_df["solver_name"].tolist())
+
+
+def get_guarantee_aware_oracle_solvers(
+    benchmark_df: pd.DataFrame,
+    maze_family: str,
+) -> set[str]:
+    """
+    Return guarantee-aware oracle solvers for the given maze family.
+
+    Guarantee-aware oracle definition:
+    Among solvers with shortest-path guarantees, choose those that found a
+    shortest path with the lowest expanded-node count.
+
+    Guaranteed shortest-path solvers in this project:
+    - BFS
+    - Dijkstra
+    - A*
+    """
+    family_df = benchmark_df[benchmark_df["maze_family"] == maze_family]
+
+    if family_df.empty:
+        raise ValueError(f"No benchmark rows found for maze family: {maze_family}")
+
+    guaranteed_df = family_df[
+        family_df["solver_name"].isin(GUARANTEED_SHORTEST_PATH_SOLVERS)
+        & (family_df["success"] == True)
+        & (family_df["is_shortest_path"] == True)
+    ]
+
+    if guaranteed_df.empty:
+        raise ValueError(
+            f"No guarantee-aware oracle solver found for maze family: {maze_family}"
+        )
+
+    best_expanded = guaranteed_df["expanded_nodes"].min()
+
+    oracle_df = guaranteed_df[
+        guaranteed_df["expanded_nodes"] == best_expanded
+    ]
 
     return set(oracle_df["solver_name"].tolist())
 
@@ -82,7 +132,12 @@ def evaluate_single_llm_response(
     """
     parsed = parse_llm_selection_response(raw_response)
 
-    oracle_solvers = get_oracle_solvers(
+    empirical_oracle_solvers = get_oracle_solvers(
+        benchmark_df=benchmark_df,
+        maze_family=true_maze_family,
+    )
+
+    guarantee_aware_oracle_solvers = get_guarantee_aware_oracle_solvers(
         benchmark_df=benchmark_df,
         maze_family=true_maze_family,
     )
@@ -93,11 +148,18 @@ def evaluate_single_llm_response(
         solver_name=parsed.recommended_solver,
     )
 
-    oracle_expanded_nodes = min(
+    empirical_oracle_expanded_nodes = min(
         get_solver_row(benchmark_df, true_maze_family, solver_name)[
             "expanded_nodes"
         ]
-        for solver_name in oracle_solvers
+        for solver_name in empirical_oracle_solvers
+    )
+
+    guarantee_aware_oracle_expanded_nodes = min(
+        get_solver_row(benchmark_df, true_maze_family, solver_name)[
+            "expanded_nodes"
+        ]
+        for solver_name in guarantee_aware_oracle_solvers
     )
 
     selected_expanded_nodes = int(selected_solver_row["expanded_nodes"])
@@ -105,7 +167,14 @@ def evaluate_single_llm_response(
     shortest_path_length = int(selected_solver_row["shortest_path_length"])
 
     classification_correct = parsed.edge_case_class == true_maze_family
-    solver_selection_correct = parsed.recommended_solver in oracle_solvers
+
+    empirical_solver_selection_correct = (
+        parsed.recommended_solver in empirical_oracle_solvers
+    )
+
+    guarantee_aware_solver_selection_correct = (
+        parsed.recommended_solver in guarantee_aware_oracle_solvers
+    )
 
     selected_solver_success = bool(selected_solver_row["success"])
     selected_solver_shortest_path = bool(selected_solver_row["is_shortest_path"])
@@ -115,7 +184,13 @@ def evaluate_single_llm_response(
         or not selected_solver_shortest_path
     )
 
-    expansion_regret = selected_expanded_nodes - int(oracle_expanded_nodes)
+    empirical_expansion_regret = (
+        selected_expanded_nodes - int(empirical_oracle_expanded_nodes)
+    )
+
+    guarantee_aware_expansion_regret = (
+        selected_expanded_nodes - int(guarantee_aware_oracle_expanded_nodes)
+    )
 
     return {
         "model_name": model_name,
@@ -125,17 +200,27 @@ def evaluate_single_llm_response(
         "recommended_solver": parsed.recommended_solver,
         "confidence": parsed.confidence,
         "reason": parsed.reason,
-        "oracle_solvers": "|".join(sorted(oracle_solvers)),
+        "empirical_oracle_solvers": "|".join(sorted(empirical_oracle_solvers)),
+        "guarantee_aware_oracle_solvers": "|".join(
+            sorted(guarantee_aware_oracle_solvers)
+        ),
         "classification_correct": classification_correct,
-        "solver_selection_correct": solver_selection_correct,
+        "empirical_solver_selection_correct": empirical_solver_selection_correct,
+        "guarantee_aware_solver_selection_correct": (
+            guarantee_aware_solver_selection_correct
+        ),
         "selected_solver_success": selected_solver_success,
         "selected_solver_shortest_path": selected_solver_shortest_path,
         "quality_failure": quality_failure,
         "selected_path_length": selected_path_length,
         "shortest_path_length": shortest_path_length,
         "selected_expanded_nodes": selected_expanded_nodes,
-        "oracle_expanded_nodes": int(oracle_expanded_nodes),
-        "expansion_regret": expansion_regret,
+        "empirical_oracle_expanded_nodes": int(empirical_oracle_expanded_nodes),
+        "guarantee_aware_oracle_expanded_nodes": int(
+            guarantee_aware_oracle_expanded_nodes
+        ),
+        "empirical_expansion_regret": empirical_expansion_regret,
+        "guarantee_aware_expansion_regret": guarantee_aware_expansion_regret,
     }
 
 
@@ -182,8 +267,11 @@ def summarize_llm_evaluation(evaluation_df: pd.DataFrame) -> dict[str, float]:
         "classification_accuracy": float(
             evaluation_df["classification_correct"].mean()
         ),
-        "solver_selection_accuracy": float(
-            evaluation_df["solver_selection_correct"].mean()
+        "empirical_solver_selection_accuracy": float(
+            evaluation_df["empirical_solver_selection_correct"].mean()
+        ),
+        "guarantee_aware_solver_selection_accuracy": float(
+            evaluation_df["guarantee_aware_solver_selection_correct"].mean()
         ),
         "shortest_path_rate": float(
             evaluation_df["selected_solver_shortest_path"].mean()
@@ -191,8 +279,11 @@ def summarize_llm_evaluation(evaluation_df: pd.DataFrame) -> dict[str, float]:
         "quality_failure_rate": float(
             evaluation_df["quality_failure"].mean()
         ),
-        "average_expansion_regret": float(
-            evaluation_df["expansion_regret"].mean()
+        "average_empirical_expansion_regret": float(
+            evaluation_df["empirical_expansion_regret"].mean()
+        ),
+        "average_guarantee_aware_expansion_regret": float(
+            evaluation_df["guarantee_aware_expansion_regret"].mean()
         ),
     }
 

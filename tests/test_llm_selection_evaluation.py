@@ -4,6 +4,7 @@ import pytest
 from src.experiments.evaluate_llm_selection import (
     evaluate_llm_response_rows,
     evaluate_single_llm_response,
+    get_guarantee_aware_oracle_solvers,
     get_oracle_solvers,
     get_solver_row,
     summarize_llm_evaluation,
@@ -58,6 +59,17 @@ def test_get_oracle_solvers() -> None:
     assert oracle_solvers == {"A*"}
 
 
+def test_get_guarantee_aware_oracle_solvers() -> None:
+    benchmark_df = make_test_benchmark_df()
+
+    oracle_solvers = get_guarantee_aware_oracle_solvers(
+        benchmark_df=benchmark_df,
+        maze_family="GREEDY_TRAP",
+    )
+
+    assert oracle_solvers == {"A*"}
+
+
 def test_get_oracle_solvers_rejects_unknown_family() -> None:
     benchmark_df = make_test_benchmark_df()
 
@@ -101,10 +113,12 @@ def test_evaluate_single_correct_oracle_selection() -> None:
     )
 
     assert result["classification_correct"] is True
-    assert result["solver_selection_correct"] is True
+    assert result["empirical_solver_selection_correct"] is True
+    assert result["guarantee_aware_solver_selection_correct"] is True
     assert result["selected_solver_shortest_path"] is True
     assert result["quality_failure"] is False
-    assert result["expansion_regret"] == 0
+    assert result["empirical_expansion_regret"] == 0
+    assert result["guarantee_aware_expansion_regret"] == 0
 
 
 def test_evaluate_single_shortest_but_not_oracle_selection() -> None:
@@ -128,10 +142,12 @@ def test_evaluate_single_shortest_but_not_oracle_selection() -> None:
     )
 
     assert result["classification_correct"] is True
-    assert result["solver_selection_correct"] is False
+    assert result["empirical_solver_selection_correct"] is False
+    assert result["guarantee_aware_solver_selection_correct"] is False
     assert result["selected_solver_shortest_path"] is True
     assert result["quality_failure"] is False
-    assert result["expansion_regret"] == 17
+    assert result["empirical_expansion_regret"] == 17
+    assert result["guarantee_aware_expansion_regret"] == 17
 
 
 def test_evaluate_single_quality_failure() -> None:
@@ -155,10 +171,52 @@ def test_evaluate_single_quality_failure() -> None:
     )
 
     assert result["classification_correct"] is True
-    assert result["solver_selection_correct"] is False
+    assert result["empirical_solver_selection_correct"] is False
+    assert result["guarantee_aware_solver_selection_correct"] is False
     assert result["selected_solver_shortest_path"] is False
     assert result["quality_failure"] is True
-    assert result["expansion_regret"] == -9
+    assert result["empirical_expansion_regret"] == -9
+    assert result["guarantee_aware_expansion_regret"] == -9
+
+
+def test_empirical_and_guarantee_aware_oracles_can_differ() -> None:
+    benchmark_df = pd.DataFrame(
+        [
+            {
+                "maze_family": "TEST_MAZE",
+                "solver_name": "DFS",
+                "success": True,
+                "path_length": 10,
+                "shortest_path_length": 10,
+                "expanded_nodes": 5,
+                "is_shortest_path": True,
+                "is_best_optimal_expansion": True,
+            },
+            {
+                "maze_family": "TEST_MAZE",
+                "solver_name": "A*",
+                "success": True,
+                "path_length": 10,
+                "shortest_path_length": 10,
+                "expanded_nodes": 8,
+                "is_shortest_path": True,
+                "is_best_optimal_expansion": False,
+            },
+        ]
+    )
+
+    empirical_oracle = get_oracle_solvers(
+        benchmark_df=benchmark_df,
+        maze_family="TEST_MAZE",
+    )
+
+    guarantee_aware_oracle = get_guarantee_aware_oracle_solvers(
+        benchmark_df=benchmark_df,
+        maze_family="TEST_MAZE",
+    )
+
+    assert empirical_oracle == {"DFS"}
+    assert guarantee_aware_oracle == {"A*"}
 
 
 def test_evaluate_llm_response_rows() -> None:
@@ -194,17 +252,21 @@ def test_summarize_llm_evaluation() -> None:
         [
             {
                 "classification_correct": True,
-                "solver_selection_correct": True,
+                "empirical_solver_selection_correct": True,
+                "guarantee_aware_solver_selection_correct": True,
                 "selected_solver_shortest_path": True,
                 "quality_failure": False,
-                "expansion_regret": 0,
+                "empirical_expansion_regret": 0,
+                "guarantee_aware_expansion_regret": 0,
             },
             {
                 "classification_correct": False,
-                "solver_selection_correct": False,
+                "empirical_solver_selection_correct": False,
+                "guarantee_aware_solver_selection_correct": True,
                 "selected_solver_shortest_path": True,
                 "quality_failure": False,
-                "expansion_regret": 10,
+                "empirical_expansion_regret": 10,
+                "guarantee_aware_expansion_regret": 0,
             },
         ]
     )
@@ -213,10 +275,12 @@ def test_summarize_llm_evaluation() -> None:
 
     assert summary["n"] == 2.0
     assert summary["classification_accuracy"] == 0.5
-    assert summary["solver_selection_accuracy"] == 0.5
+    assert summary["empirical_solver_selection_accuracy"] == 0.5
+    assert summary["guarantee_aware_solver_selection_accuracy"] == 1.0
     assert summary["shortest_path_rate"] == 1.0
     assert summary["quality_failure_rate"] == 0.0
-    assert summary["average_expansion_regret"] == 5.0
+    assert summary["average_empirical_expansion_regret"] == 5.0
+    assert summary["average_guarantee_aware_expansion_regret"] == 0.0
 
 
 def test_summarize_llm_evaluation_rejects_empty_df() -> None:
