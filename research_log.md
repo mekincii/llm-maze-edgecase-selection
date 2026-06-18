@@ -312,3 +312,32 @@ The prompt CSV is small and reproducible, so it was committed to Git. Future lar
 * Add a script for evaluating saved LLM response files.
 * Run initial manual or model-generated responses on the 15-prompt dataset.
 
+## 2026-06-12 — LLM Response File Workflow
+
+### Goal
+Create a file-based workflow for collecting and evaluating LLM responses.
+
+### Work completed
+- Added `generate_llm_response_template.py`.
+- Added `evaluate_llm_response_file.py`.
+- Added tests for response-template generation and response-file evaluation.
+- Generated `data/prompts/llm_responses_template.csv`.
+- Confirmed that rows with empty `raw_response` values are skipped.
+- Confirmed that the evaluator exits cleanly when no completed responses exist.
+- Confirmed that all tests pass.
+- Pushed the repository to GitHub.
+
+### Methodological importance
+The project now separates prompt generation, response collection, response validation, and solver-selection evaluation. This makes the LLM experiment reproducible and allows manual, semi-manual, or automated LLM responses to be evaluated with the same pipeline.
+
+### Current pipeline
+`Prompt dataset → Response template → LLM JSON responses → Parser → Empirical and guarantee-aware evaluation`
+
+### Next steps
+- Fill `raw_response` values for the 15 prompts.
+- Evaluate completed responses with `evaluate_llm_response_file.py`.
+- Compare results across representation modes:
+  - `features`
+  - `ascii`
+  - `features_ascii`
+
