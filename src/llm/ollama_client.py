@@ -21,6 +21,8 @@ def build_ollama_generate_payload(
     temperature: float = 0.0,
     seed: int = 42,
     num_predict: int = 512,
+    think: bool = False,
+    response_format: str | None = "json",
 ) -> dict[str, Any]:
     """
     Build payload for Ollama /api/generate.
@@ -28,16 +30,22 @@ def build_ollama_generate_payload(
     stream=False is important because it returns one complete JSON object,
     which is easier for our experiment pipeline.
     """
-    return {
+    payload = {
         "model": model,
         "prompt": prompt,
         "stream": False,
+        "think": think,
         "options": {
             "temperature": temperature,
             "seed": seed,
             "num_predict": num_predict,
         },
     }
+
+    if response_format is not None:
+        payload["format"] = response_format
+
+    return payload
 
 
 def generate_with_ollama(
@@ -47,7 +55,9 @@ def generate_with_ollama(
     temperature: float = 0.0,
     seed: int = 42,
     num_predict: int = 512,
+    think: bool = False,
     timeout_seconds: int = 180,
+    response_format: str | None = "json",
 ) -> OllamaGenerateResult:
     """
     Generate a response from a local Ollama model.
@@ -61,6 +71,8 @@ def generate_with_ollama(
         temperature=temperature,
         seed=seed,
         num_predict=num_predict,
+        think=think,
+        response_format=response_format,
     )
 
     request = Request(

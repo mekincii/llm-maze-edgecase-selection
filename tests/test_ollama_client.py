@@ -36,6 +36,8 @@ def test_build_ollama_generate_payload() -> None:
     assert payload["options"]["temperature"] == 0.0
     assert payload["options"]["seed"] == 42
     assert payload["options"]["num_predict"] == 128
+    assert payload["think"] is False
+    assert payload["format"] == "json"
 
 
 def test_generate_with_ollama_parses_response() -> None:

@@ -82,7 +82,15 @@ def run_ollama_prompt_rows(
                 temperature=temperature,
                 seed=seed,
                 num_predict=num_predict,
+                think=False,
+                response_format="json",
             )
+
+            if not result.response.strip():
+                raise RuntimeError(
+                    f"Ollama returned an empty response for model={model_name}, "
+                    f"prompt_id={prompt_id}."
+                )
 
             rows.append(
                 {
@@ -120,7 +128,7 @@ def main() -> None:
         temperature=0.0,
         seed=42,
         num_predict=512,
-        limit_prompts=None,
+        limit_prompts=1,
     )
 
     save_ollama_responses(rows, OUTPUT_PATH)
