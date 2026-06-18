@@ -1,15 +1,25 @@
 project:
   name: llm-maze-edgecase-selection
-  seed: 42
+  grid_width: 15
+  grid_height: 15
 
-maze:
-  default_width: 15
-  default_height: 15
-  wall_symbol: "#"
-  free_symbol: "."
-  start_symbol: "S"
-  goal_symbol: "G"
+models:
+  ollama:
+    - qwen3:1.7b
+    - qwen3:4b
+    - qwen3:8b
 
-experiments:
-  output_dir: data/results
-  figure_dir: figures
+prompt_versions:
+  v1_labels_only:
+    prompt_path: data/prompts/llm_prompts.csv
+    response_path: data/results/ollama_responses.csv
+  v2_definitions:
+    prompt_path: data/prompts/llm_prompts_v2_definitions.csv
+    response_path: data/results/ollama_responses_v2_definitions.csv
+  v3_operational:
+    prompt_path: data/prompts/llm_prompts_v3_operational.csv
+    response_path: data/results/ollama_responses_v3_operational.csv
+
+outputs:
+  prompt_version_comparison: data/results/prompt_version_comparison.csv
+  figures_dir: figures/papers
