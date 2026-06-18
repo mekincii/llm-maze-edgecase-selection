@@ -186,10 +186,16 @@ def evaluate_single_llm_response(
 
     empirical_expansion_regret = (
         selected_expanded_nodes - int(empirical_oracle_expanded_nodes)
+        if selected_solver_shortest_path
+        else None
     )
 
-    guarantee_aware_expansion_regret = (
+    guarantee_aware_expansion_delta = (
         selected_expanded_nodes - int(guarantee_aware_oracle_expanded_nodes)
+    )
+
+    guarantee_aware_policy_violation = (
+        parsed.recommended_solver not in GUARANTEED_SHORTEST_PATH_SOLVERS
     )
 
     return {
@@ -212,6 +218,7 @@ def evaluate_single_llm_response(
         "selected_solver_success": selected_solver_success,
         "selected_solver_shortest_path": selected_solver_shortest_path,
         "quality_failure": quality_failure,
+        "guarantee_aware_policy_violation": guarantee_aware_policy_violation,
         "selected_path_length": selected_path_length,
         "shortest_path_length": shortest_path_length,
         "selected_expanded_nodes": selected_expanded_nodes,
@@ -220,7 +227,7 @@ def evaluate_single_llm_response(
             guarantee_aware_oracle_expanded_nodes
         ),
         "empirical_expansion_regret": empirical_expansion_regret,
-        "guarantee_aware_expansion_regret": guarantee_aware_expansion_regret,
+        "guarantee_aware_expansion_delta": guarantee_aware_expansion_delta,
     }
 
 
@@ -279,11 +286,14 @@ def summarize_llm_evaluation(evaluation_df: pd.DataFrame) -> dict[str, float]:
         "quality_failure_rate": float(
             evaluation_df["quality_failure"].mean()
         ),
+        "guarantee_aware_policy_violation_rate": float(
+            evaluation_df["guarantee_aware_policy_violation"].mean()
+        ),
         "average_empirical_expansion_regret": float(
             evaluation_df["empirical_expansion_regret"].mean()
         ),
-        "average_guarantee_aware_expansion_regret": float(
-            evaluation_df["guarantee_aware_expansion_regret"].mean()
+        "average_guarantee_aware_expansion_delta": float(
+            evaluation_df["guarantee_aware_expansion_delta"].mean()
         ),
     }
 

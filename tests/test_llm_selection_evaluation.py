@@ -118,7 +118,8 @@ def test_evaluate_single_correct_oracle_selection() -> None:
     assert result["selected_solver_shortest_path"] is True
     assert result["quality_failure"] is False
     assert result["empirical_expansion_regret"] == 0
-    assert result["guarantee_aware_expansion_regret"] == 0
+    assert result["guarantee_aware_expansion_delta"] == 0
+    assert result["guarantee_aware_policy_violation"] is False
 
 
 def test_evaluate_single_shortest_but_not_oracle_selection() -> None:
@@ -147,7 +148,8 @@ def test_evaluate_single_shortest_but_not_oracle_selection() -> None:
     assert result["selected_solver_shortest_path"] is True
     assert result["quality_failure"] is False
     assert result["empirical_expansion_regret"] == 17
-    assert result["guarantee_aware_expansion_regret"] == 17
+    assert result["guarantee_aware_expansion_delta"] == 17
+    assert result["guarantee_aware_policy_violation"] is True
 
 
 def test_evaluate_single_quality_failure() -> None:
@@ -175,8 +177,32 @@ def test_evaluate_single_quality_failure() -> None:
     assert result["guarantee_aware_solver_selection_correct"] is False
     assert result["selected_solver_shortest_path"] is False
     assert result["quality_failure"] is True
-    assert result["empirical_expansion_regret"] == -9
-    assert result["guarantee_aware_expansion_regret"] == -9
+    assert result["empirical_expansion_regret"] is None
+    assert result["guarantee_aware_expansion_delta"] == -9
+    assert result["guarantee_aware_policy_violation"] is True
+
+
+def test_guarantee_aware_policy_violation_for_non_guaranteed_solver() -> None:
+    benchmark_df = make_test_benchmark_df()
+
+    raw_response = """
+    {
+      "edge_case_class": "GREEDY_TRAP",
+      "recommended_solver": "Greedy Best-First",
+      "confidence": 0.7,
+      "reason": "Greedy is heuristic-directed."
+    }
+    """
+
+    result = evaluate_single_llm_response(
+        benchmark_df=benchmark_df,
+        true_maze_family="GREEDY_TRAP",
+        representation_mode="features_ascii",
+        raw_response=raw_response,
+        model_name="mock",
+    )
+
+    assert result["guarantee_aware_policy_violation"] is True
 
 
 def test_empirical_and_guarantee_aware_oracles_can_differ() -> None:
@@ -256,8 +282,9 @@ def test_summarize_llm_evaluation() -> None:
                 "guarantee_aware_solver_selection_correct": True,
                 "selected_solver_shortest_path": True,
                 "quality_failure": False,
+                "guarantee_aware_policy_violation": False,
                 "empirical_expansion_regret": 0,
-                "guarantee_aware_expansion_regret": 0,
+                "guarantee_aware_expansion_delta": 0,
             },
             {
                 "classification_correct": False,
@@ -265,8 +292,9 @@ def test_summarize_llm_evaluation() -> None:
                 "guarantee_aware_solver_selection_correct": True,
                 "selected_solver_shortest_path": True,
                 "quality_failure": False,
+                "guarantee_aware_policy_violation": False,
                 "empirical_expansion_regret": 10,
-                "guarantee_aware_expansion_regret": 0,
+                "guarantee_aware_expansion_delta": 0,
             },
         ]
     )
@@ -279,8 +307,9 @@ def test_summarize_llm_evaluation() -> None:
     assert summary["guarantee_aware_solver_selection_accuracy"] == 1.0
     assert summary["shortest_path_rate"] == 1.0
     assert summary["quality_failure_rate"] == 0.0
+    assert summary["guarantee_aware_policy_violation_rate"] == 0.0
     assert summary["average_empirical_expansion_regret"] == 5.0
-    assert summary["average_guarantee_aware_expansion_regret"] == 0.0
+    assert summary["average_guarantee_aware_expansion_delta"] == 0.0
 
 
 def test_summarize_llm_evaluation_rejects_empty_df() -> None:
