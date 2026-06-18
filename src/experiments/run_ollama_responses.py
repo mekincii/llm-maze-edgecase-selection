@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any
+import sys
 
 import pandas as pd
 
@@ -119,8 +120,33 @@ def save_ollama_responses(
     df.to_csv(output_path, index=False)
 
 
+def resolve_run_paths_from_args() -> tuple[Path, Path]:
+    """
+    Resolve prompt and output CSV paths from command-line arguments.
+
+    Usage:
+        python -m src.experiments.run_ollama_responses
+
+        python -m src.experiments.run_ollama_responses \
+            data/prompts/llm_prompts_v2_definitions.csv \
+            data/results/ollama_responses_v2_definitions.csv
+    """
+    if len(sys.argv) == 1:
+        return PROMPTS_PATH, OUTPUT_PATH
+
+    if len(sys.argv) == 3:
+        return Path(sys.argv[1]), Path(sys.argv[2])
+
+    raise ValueError(
+        "Usage: python -m src.experiments.run_ollama_responses "
+        "[optional_prompt_csv_path optional_output_csv_path]"
+    )
+
+
 def main() -> None:
-    prompt_df = load_prompt_rows(PROMPTS_PATH)
+    prompt_path, output_path = resolve_run_paths_from_args()
+
+    prompt_df = load_prompt_rows(prompt_path)
 
     rows = run_ollama_prompt_rows(
         prompt_df=prompt_df,
@@ -128,18 +154,18 @@ def main() -> None:
         temperature=0.0,
         seed=42,
         num_predict=512,
-        limit_prompts=1,
+        limit_prompts=None,
     )
 
-    save_ollama_responses(rows, OUTPUT_PATH)
+    save_ollama_responses(rows, output_path)
 
     print()
-    print(f"Saved {len(rows)} Ollama response rows to {OUTPUT_PATH}")
+    print(f"Saved {len(rows)} Ollama response rows to {output_path}")
     print()
     print("Evaluate with:")
     print(
         "python -m src.experiments.evaluate_llm_response_file "
-        "after copying/renaming this file if needed."
+        f"{output_path}"
     )
 
 
