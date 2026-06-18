@@ -264,3 +264,51 @@ The LLM is treated as a meta-level classifier and solver selector, not as a dire
 Add an LLM selection evaluation script that compares validated LLM decisions against the oracle labels from the classical benchmark.
 
 
+## 2026-06-12 — LLM Prompt Dataset Generation
+
+### Goal
+
+Create a fixed prompt dataset for LLM-based maze edge-case classification and solver-selection experiments.
+
+### Work completed
+
+* Added `generate_llm_prompts.py`.
+* Added tests for prompt dataset generation.
+* Generated `data/prompts/llm_prompts.csv`.
+* The prompt dataset contains 15 prompts:
+
+  * 5 maze families
+  * 3 representation modes per maze
+
+### Maze families
+
+* `OPEN`
+* `COMB`
+* `ASTAR_TRAP`
+* `DFS_TRAP`
+* `GREEDY_TRAP`
+
+### Representation modes
+
+* `features`
+* `ascii`
+* `features_ascii`
+
+### Methodological decision
+
+The generated prompts exclude shortest-path-derived features by default. This keeps the LLM solver-selection task in a pre-search setting, where the model must recommend a solver without being given information that would require already running a shortest-path algorithm.
+
+### Current pipeline
+
+`Maze family → Prompt representation → LLM prompt dataset → Future LLM responses → Response parser → Empirical and guarantee-aware evaluation`
+
+### Notes
+
+The prompt CSV is small and reproducible, so it was committed to Git. Future larger generated outputs may be excluded from Git or stored as experiment artifacts depending on size.
+
+### Next steps
+
+* Create a response collection format for LLM outputs.
+* Add a script for evaluating saved LLM response files.
+* Run initial manual or model-generated responses on the 15-prompt dataset.
+
