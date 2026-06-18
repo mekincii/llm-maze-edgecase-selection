@@ -25,11 +25,55 @@ ALLOWED_EDGE_CASE_CLASSES = [
     "UNKNOWN",
 ]
 
+EDGE_CASE_DEFINITIONS = {
+    "OPEN": (
+        "A baseline maze with no walls or major obstacles. It tests how solvers "
+        "behave when the direct Manhattan path is available and broad exploration "
+        "is unnecessary."
+    ),
+    "COMB": (
+        "A corridor-and-branch maze with repeated side branches or dead-end-like "
+        "structures. It tests whether solvers waste expansions exploring branches."
+    ),
+    "ASTAR_TRAP": (
+        "A heuristic-deception maze where the start and goal appear close under "
+        "Manhattan distance, but walls force a much longer route. It tests whether "
+        "heuristic-guided solvers are misled by geometric closeness."
+    ),
+    "DFS_TRAP": (
+        "A maze where DFS can follow a valid but longer route because it is "
+        "sensitive to traversal order and does not guarantee shortest paths."
+    ),
+    "GREEDY_TRAP": (
+        "A maze where Greedy Best-First Search may be attracted toward cells that "
+        "look close to the goal and expand inefficiently. It is an expansion trap, "
+        "not necessarily a path-optimality failure."
+    ),
+    "UNKNOWN": (
+        "Use this only when the maze does not clearly match any of the defined "
+        "edge-case classes."
+    ),
+}
 
 SOLUTION_DERIVED_FEATURE_KEYS = {
     "shortest_path_length",
     "shortest_path_to_manhattan_ratio",
 }
+
+def format_edge_case_definitions() -> str:
+    """
+    Format edge-case class definitions for prompt v2.
+
+    These definitions are intended to help the LLM map structural maze
+    descriptions to our controlled diagnostic labels.
+    """
+    lines = []
+
+    for edge_case_class in ALLOWED_EDGE_CASE_CLASSES:
+        definition = EDGE_CASE_DEFINITIONS[edge_case_class]
+        lines.append(f"- {edge_case_class}: {definition}")
+
+    return "\n".join(lines)
 
 
 def format_feature_summary(
@@ -87,6 +131,7 @@ def build_solver_selection_prompt(
     ascii_maze: str | None = None,
     representation_mode: RepresentationMode = "features_ascii",
     include_solution_features: bool = False,
+    include_edge_case_definitions: bool = False,
 ) -> str:
     """
     Build an LLM prompt for edge-case classification and solver selection.
@@ -122,6 +167,14 @@ def build_solver_selection_prompt(
 
     solver_list = ", ".join(ALLOWED_SOLVERS)
     class_list = ", ".join(ALLOWED_EDGE_CASE_CLASSES)
+
+    edge_case_definition_section = ""
+
+    if include_edge_case_definitions:
+        edge_case_definition_section = (
+            "\n\nEdge-case class definitions:\n"
+            f"{format_edge_case_definitions()}"
+        )
 
     representation_sections: list[str] = []
 
@@ -166,7 +219,7 @@ The available classical solvers are:
 {solver_list}
 
 The possible edge-case classes are:
-{class_list}
+{class_list}{edge_case_definition_section}
 
 Selection objective:
 Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
@@ -189,6 +242,7 @@ def build_prompt_for_maze(
     maze: MazeGrid,
     representation_mode: RepresentationMode = "features_ascii",
     include_solution_features: bool = False,
+    include_edge_case_definitions: bool = False,
 ) -> str:
     """
     Convenience wrapper that extracts features from a MazeGrid
@@ -202,4 +256,5 @@ def build_prompt_for_maze(
         ascii_maze=ascii_maze,
         representation_mode=representation_mode,
         include_solution_features=include_solution_features,
+        include_edge_case_definitions=include_edge_case_definitions,
     )

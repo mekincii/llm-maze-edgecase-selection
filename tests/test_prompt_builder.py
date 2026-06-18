@@ -3,8 +3,10 @@ import pytest
 from src.llm.prompt_builder import (
     ALLOWED_EDGE_CASE_CLASSES,
     ALLOWED_SOLVERS,
+    EDGE_CASE_DEFINITIONS,
     build_prompt_for_maze,
     build_solver_selection_prompt,
+    format_edge_case_definitions,
     format_feature_summary,
 )
 from src.maze.edge_cases import create_greedy_trap_maze
@@ -178,3 +180,37 @@ def test_build_solver_selection_prompt_rejects_missing_ascii() -> None:
             ascii_maze=None,
             representation_mode="ascii",
         )
+
+def test_format_edge_case_definitions_contains_all_classes() -> None:
+    definitions = format_edge_case_definitions()
+
+    for edge_case_class in ALLOWED_EDGE_CASE_CLASSES:
+        assert edge_case_class in definitions
+        assert EDGE_CASE_DEFINITIONS[edge_case_class] in definitions
+
+
+def test_build_prompt_for_maze_excludes_edge_case_definitions_by_default() -> None:
+    maze = create_greedy_trap_maze(width=15, height=15)
+
+    prompt = build_prompt_for_maze(
+        maze,
+        representation_mode="features_ascii",
+    )
+
+    assert "Edge-case class definitions:" not in prompt
+
+
+def test_build_prompt_for_maze_can_include_edge_case_definitions() -> None:
+    maze = create_greedy_trap_maze(width=15, height=15)
+
+    prompt = build_prompt_for_maze(
+        maze,
+        representation_mode="features_ascii",
+        include_edge_case_definitions=True,
+    )
+
+    assert "Edge-case class definitions:" in prompt
+    assert "ASTAR_TRAP" in prompt
+    assert "heuristic-deception" in prompt
+    assert "GREEDY_TRAP" in prompt
+    assert "expansion trap" in prompt

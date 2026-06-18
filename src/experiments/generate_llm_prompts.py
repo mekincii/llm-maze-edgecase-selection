@@ -10,6 +10,7 @@ from src.llm.prompt_builder import (
 
 
 OUTPUT_PATH = Path("data/prompts/llm_prompts.csv")
+V2_DEFINITIONS_OUTPUT_PATH = Path("data/prompts/llm_prompts_v2_definitions.csv")
 
 REPRESENTATION_MODES: list[RepresentationMode] = [
     "features",
@@ -22,6 +23,8 @@ def generate_prompt_rows(
     width: int = 15,
     height: int = 15,
     include_solution_features: bool = False,
+    include_edge_case_definitions: bool = False,
+    prompt_version: str = "v1_labels_only",
 ) -> list[dict[str, Any]]:
     """
     Generate prompt rows for all maze families and representation modes.
@@ -39,11 +42,13 @@ def generate_prompt_rows(
                 maze=maze,
                 representation_mode=representation_mode,
                 include_solution_features=include_solution_features,
+                include_edge_case_definitions=include_edge_case_definitions,
             )
 
             rows.append(
                 {
                     "prompt_id": f"{maze_family}__{representation_mode}",
+                    "prompt_version": prompt_version,
                     "maze_family": maze_family,
                     "width": width,
                     "height": height,
@@ -78,11 +83,13 @@ def main() -> None:
         width=15,
         height=15,
         include_solution_features=False,
+        include_edge_case_definitions=True,
+        prompt_version="v2_definitions",
     )
 
-    save_prompt_rows_to_csv(rows, OUTPUT_PATH)
+    save_prompt_rows_to_csv(rows, V2_DEFINITIONS_OUTPUT_PATH)
 
-    print(f"Saved {len(rows)} LLM prompts to {OUTPUT_PATH}")
+    print(f"Saved {len(rows)} LLM prompts to {V2_DEFINITIONS_OUTPUT_PATH}")
 
     print()
     print("Prompt IDs:")

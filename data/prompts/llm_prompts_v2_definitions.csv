@@ -1,0 +1,746 @@
+prompt_id,prompt_version,maze_family,width,height,representation_mode,include_solution_features,prompt
+OPEN__features,v2_definitions,OPEN,15,15,features,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 225
+Wall cells: 0
+Wall density: 0.000
+Start-goal Manhattan distance: 28
+Dead-end count: 0
+Corridor cell count: 4
+Junction count: 221
+Average branching factor: 3.733
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+OPEN__ascii,v2_definitions,OPEN,15,15,ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+S..............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+..............G
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+OPEN__features_ascii,v2_definitions,OPEN,15,15,features_ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 225
+Wall cells: 0
+Wall density: 0.000
+Start-goal Manhattan distance: 28
+Dead-end count: 0
+Corridor cell count: 4
+Junction count: 221
+Average branching factor: 3.733
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+S..............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+..............G
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+COMB__features,v2_definitions,COMB,15,15,features,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 85
+Wall cells: 140
+Wall density: 0.622
+Start-goal Manhattan distance: 12
+Dead-end count: 8
+Corridor cell count: 71
+Junction count: 6
+Average branching factor: 1.976
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+COMB__ascii,v2_definitions,COMB,15,15,ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+#S...........G#
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+COMB__features_ascii,v2_definitions,COMB,15,15,features_ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 85
+Wall cells: 140
+Wall density: 0.622
+Start-goal Manhattan distance: 12
+Dead-end count: 8
+Corridor cell count: 71
+Junction count: 6
+Average branching factor: 1.976
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+##.#.#.#.#.#.##
+#S...........G#
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+ASTAR_TRAP__features,v2_definitions,ASTAR_TRAP,15,15,features,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 200
+Wall cells: 25
+Wall density: 0.111
+Start-goal Manhattan distance: 14
+Dead-end count: 0
+Corridor cell count: 12
+Junction count: 188
+Average branching factor: 3.450
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+ASTAR_TRAP__ascii,v2_definitions,ASTAR_TRAP,15,15,ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+S...........#.G
+............#..
+.#############.
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+...............
+...............
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+ASTAR_TRAP__features_ascii,v2_definitions,ASTAR_TRAP,15,15,features_ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 200
+Wall cells: 25
+Wall density: 0.111
+Start-goal Manhattan distance: 14
+Dead-end count: 0
+Corridor cell count: 12
+Junction count: 188
+Average branching factor: 3.450
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+S...........#.G
+............#..
+.#############.
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+............#..
+...............
+...............
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+DFS_TRAP__features,v2_definitions,DFS_TRAP,15,15,features,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 48
+Wall cells: 177
+Wall density: 0.787
+Start-goal Manhattan distance: 12
+Dead-end count: 0
+Corridor cell count: 48
+Junction count: 0
+Average branching factor: 2.000
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+DFS_TRAP__ascii,v2_definitions,DFS_TRAP,15,15,ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+#S...........G#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.............#
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+DFS_TRAP__features_ascii,v2_definitions,DFS_TRAP,15,15,features_ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 48
+Wall cells: 177
+Wall density: 0.787
+Start-goal Manhattan distance: 12
+Dead-end count: 0
+Corridor cell count: 48
+Junction count: 0
+Average branching factor: 2.000
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+#S...........G#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.###########.#
+#.............#
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+GREEDY_TRAP__features,v2_definitions,GREEDY_TRAP,15,15,features,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 47
+Wall cells: 178
+Wall density: 0.791
+Start-goal Manhattan distance: 12
+Dead-end count: 2
+Corridor cell count: 31
+Junction count: 14
+Average branching factor: 2.255
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+GREEDY_TRAP__ascii,v2_definitions,GREEDY_TRAP,15,15,ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+###############
+###############
+###############
+####..........#
+####........###
+###########.#.#
+#S..........#G#
+#.###########.#
+#.............#
+###############
+###############
+###############
+###############
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"
+GREEDY_TRAP__features_ascii,v2_definitions,GREEDY_TRAP,15,15,features_ascii,False,"You are analyzing a grid-based maze pathfinding problem.
+
+The available classical solvers are:
+BFS, DFS, Dijkstra, A*, Greedy Best-First
+
+The possible edge-case classes are:
+OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN
+
+Edge-case class definitions:
+- OPEN: A baseline maze with no walls or major obstacles. It tests how solvers behave when the direct Manhattan path is available and broad exploration is unnecessary.
+- COMB: A corridor-and-branch maze with repeated side branches or dead-end-like structures. It tests whether solvers waste expansions exploring branches.
+- ASTAR_TRAP: A heuristic-deception maze where the start and goal appear close under Manhattan distance, but walls force a much longer route. It tests whether heuristic-guided solvers are misled by geometric closeness.
+- DFS_TRAP: A maze where DFS can follow a valid but longer route because it is sensitive to traversal order and does not guarantee shortest paths.
+- GREEDY_TRAP: A maze where Greedy Best-First Search may be attracted toward cells that look close to the goal and expand inefficiently. It is an expansion trap, not necessarily a path-optimality failure.
+- UNKNOWN: Use this only when the maze does not clearly match any of the defined edge-case classes.
+
+Selection objective:
+Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
+
+Methodological note:
+The feature summary excludes shortest-path-derived values so that the solver recommendation is made before running a shortest-path algorithm.
+
+Maze feature summary:
+Width: 15
+Height: 15
+Total cells: 225
+Free cells: 47
+Wall cells: 178
+Wall density: 0.791
+Start-goal Manhattan distance: 12
+Dead-end count: 2
+Corridor cell count: 31
+Junction count: 14
+Average branching factor: 2.255
+
+ASCII maze representation:
+Symbols: # = wall, . = free cell, S = start, G = goal
+###############
+###############
+###############
+###############
+####..........#
+####........###
+###########.#.#
+#S..........#G#
+#.###########.#
+#.............#
+###############
+###############
+###############
+###############
+###############
+
+Return JSON only with this exact schema:
+{
+  ""edge_case_class"": ""one of OPEN, COMB, ASTAR_TRAP, DFS_TRAP, GREEDY_TRAP, UNKNOWN"",
+  ""recommended_solver"": ""one of BFS, DFS, Dijkstra, A*, Greedy Best-First"",
+  ""confidence"": 0.0,
+  ""reason"": ""brief explanation""
+}"

@@ -83,3 +83,20 @@ def test_save_prompt_rows_to_csv_rejects_empty_rows(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="No prompt rows"):
         save_prompt_rows_to_csv([], output_path)
+
+
+def test_generate_prompt_rows_can_include_edge_case_definitions() -> None:
+    rows = generate_prompt_rows(
+        width=15,
+        height=15,
+        include_edge_case_definitions=True,
+        prompt_version="v2_definitions",
+    )
+
+    assert rows
+
+    for row in rows:
+        assert row["prompt_version"] == "v2_definitions"
+        assert "Edge-case class definitions:" in row["prompt"]
+        assert "ASTAR_TRAP" in row["prompt"]
+        assert "GREEDY_TRAP" in row["prompt"]
