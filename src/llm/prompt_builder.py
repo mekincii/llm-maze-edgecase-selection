@@ -55,6 +55,53 @@ EDGE_CASE_DEFINITIONS = {
     ),
 }
 
+EDGE_CASE_OBSERVABLE_CUES = {
+    "OPEN": [
+        "Very low or zero wall density.",
+        "No meaningful barrier between start and goal.",
+        "Few or no dead ends.",
+        "The direct Manhattan route is mostly available.",
+    ],
+    "COMB": [
+        "A main corridor with repeated side branches.",
+        "Multiple branch-like structures that may waste exploration.",
+        "Dead ends or branch corridors are more important than geometric goal deception.",
+        "Looks like a corridor-and-teeth pattern.",
+    ],
+    "ASTAR_TRAP": [
+        "Start and goal may appear geometrically close.",
+        "A wall or barrier blocks the direct route near the goal.",
+        "The shortest path is much longer than the Manhattan distance would suggest.",
+        "Low wall density can still be misleading if the wall placement creates a large detour.",
+    ],
+    "DFS_TRAP": [
+        "There is a valid short route and also a longer route that DFS may follow first.",
+        "The structure is sensitive to traversal order.",
+        "DFS can succeed but return a longer path than shortest-path solvers.",
+        "Look for corridor loops or path choices where going deep first is risky.",
+    ],
+    "GREEDY_TRAP": [
+        "Greedy Best-First may be attracted toward cells that appear close to the goal.",
+        "The maze contains a heuristic-attractive region that can cause inefficient expansion.",
+        "The issue is mainly expansion inefficiency, not necessarily path failure.",
+        "A* may avoid the same mistake by considering both cost-so-far and heuristic distance.",
+    ],
+    "UNKNOWN": [
+        "Use only when the maze does not clearly match the other classes.",
+        "Do not use UNKNOWN merely because the maze is difficult.",
+    ],
+}
+
+
+SOLVER_SELECTION_GUIDANCE = """Solver-selection guidance:
+- The grid is unweighted, so BFS, Dijkstra, and A* can return shortest paths.
+- BFS and Dijkstra are reliable but often expand broadly; do not assume they minimize node expansions.
+- A* is also shortest-path reliable here when using the Manhattan heuristic, and it often expands fewer nodes than BFS or Dijkstra.
+- DFS can be fast, but it does not generally guarantee shortest paths.
+- Greedy Best-First can be fast, but it does not generally guarantee shortest paths and may be misled by heuristic traps.
+- For the guarantee-aware objective, prefer A* when the maze has useful geometric structure unless there is strong evidence another guaranteed solver should be better.
+- Recommend DFS or Greedy Best-First only when you intentionally accept non-guaranteed behavior; otherwise avoid them for reliability-first selection."""
+
 SOLUTION_DERIVED_FEATURE_KEYS = {
     "shortest_path_length",
     "shortest_path_to_manhattan_ratio",
@@ -74,6 +121,33 @@ def format_edge_case_definitions() -> str:
         lines.append(f"- {edge_case_class}: {definition}")
 
     return "\n".join(lines)
+
+
+def format_edge_case_observable_cues() -> str:
+    """
+    Format observable cues for prompt v3.
+
+    These cues help the LLM connect maze features/layouts to diagnostic
+    edge-case classes without revealing the true label.
+    """
+    sections = []
+
+    for edge_case_class in ALLOWED_EDGE_CASE_CLASSES:
+        cues = EDGE_CASE_OBSERVABLE_CUES[edge_case_class]
+        cue_lines = "\n".join(f"  - {cue}" for cue in cues)
+        sections.append(f"- {edge_case_class}:\n{cue_lines}")
+
+    return "\n".join(sections)
+
+
+def format_solver_selection_guidance() -> str:
+    """
+    Format solver-selection guidance for prompt v3.
+
+    This is intended to reduce generic textbook mistakes such as assuming
+    BFS minimizes node expansions simply because it guarantees shortest paths.
+    """
+    return SOLVER_SELECTION_GUIDANCE
 
 
 def format_feature_summary(
@@ -132,6 +206,7 @@ def build_solver_selection_prompt(
     representation_mode: RepresentationMode = "features_ascii",
     include_solution_features: bool = False,
     include_edge_case_definitions: bool = False,
+    include_operational_guidance: bool = False,
 ) -> str:
     """
     Build an LLM prompt for edge-case classification and solver selection.
@@ -174,6 +249,16 @@ def build_solver_selection_prompt(
         edge_case_definition_section = (
             "\n\nEdge-case class definitions:\n"
             f"{format_edge_case_definitions()}"
+        )
+
+    operational_guidance_section = ""
+
+    if include_operational_guidance:
+        operational_guidance_section = (
+            "\n\nObservable edge-case cues:\n"
+            f"{format_edge_case_observable_cues()}"
+            "\n\n"
+            f"{format_solver_selection_guidance()}"
         )
 
     representation_sections: list[str] = []
@@ -219,7 +304,7 @@ The available classical solvers are:
 {solver_list}
 
 The possible edge-case classes are:
-{class_list}{edge_case_definition_section}
+{class_list}{edge_case_definition_section}{operational_guidance_section}
 
 Selection objective:
 Recommend the solver that is expected to find a shortest path while expanding as few nodes as possible. Prefer reliable shortest-path behavior over raw expansion count. Be careful: DFS and Greedy Best-First can be efficient but may be risky depending on maze structure.
@@ -243,6 +328,7 @@ def build_prompt_for_maze(
     representation_mode: RepresentationMode = "features_ascii",
     include_solution_features: bool = False,
     include_edge_case_definitions: bool = False,
+    include_operational_guidance: bool = False,
 ) -> str:
     """
     Convenience wrapper that extracts features from a MazeGrid
@@ -257,4 +343,5 @@ def build_prompt_for_maze(
         representation_mode=representation_mode,
         include_solution_features=include_solution_features,
         include_edge_case_definitions=include_edge_case_definitions,
+        include_operational_guidance=include_operational_guidance,
     )

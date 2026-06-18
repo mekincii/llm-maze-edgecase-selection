@@ -100,3 +100,24 @@ def test_generate_prompt_rows_can_include_edge_case_definitions() -> None:
         assert "Edge-case class definitions:" in row["prompt"]
         assert "ASTAR_TRAP" in row["prompt"]
         assert "GREEDY_TRAP" in row["prompt"]
+
+
+def test_generate_prompt_rows_can_include_operational_guidance() -> None:
+    rows = generate_prompt_rows(
+        width=15,
+        height=15,
+        include_edge_case_definitions=True,
+        include_operational_guidance=True,
+        prompt_version="v3_operational",
+    )
+
+    assert rows
+
+    for row in rows:
+        assert row["prompt_version"] == "v3_operational"
+        assert row["include_edge_case_definitions"] is True
+        assert row["include_operational_guidance"] is True
+        assert "Edge-case class definitions:" in row["prompt"]
+        assert "Observable edge-case cues:" in row["prompt"]
+        assert "Solver-selection guidance:" in row["prompt"]
+        assert "do not assume they minimize node expansions" in row["prompt"]

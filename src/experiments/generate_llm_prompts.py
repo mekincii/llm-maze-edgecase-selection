@@ -11,6 +11,7 @@ from src.llm.prompt_builder import (
 
 OUTPUT_PATH = Path("data/prompts/llm_prompts.csv")
 V2_DEFINITIONS_OUTPUT_PATH = Path("data/prompts/llm_prompts_v2_definitions.csv")
+V3_OPERATIONAL_OUTPUT_PATH = Path("data/prompts/llm_prompts_v3_operational.csv")
 
 REPRESENTATION_MODES: list[RepresentationMode] = [
     "features",
@@ -24,6 +25,7 @@ def generate_prompt_rows(
     height: int = 15,
     include_solution_features: bool = False,
     include_edge_case_definitions: bool = False,
+    include_operational_guidance: bool = False,
     prompt_version: str = "v1_labels_only",
 ) -> list[dict[str, Any]]:
     """
@@ -43,6 +45,7 @@ def generate_prompt_rows(
                 representation_mode=representation_mode,
                 include_solution_features=include_solution_features,
                 include_edge_case_definitions=include_edge_case_definitions,
+                include_operational_guidance=include_operational_guidance,
             )
 
             rows.append(
@@ -54,6 +57,8 @@ def generate_prompt_rows(
                     "height": height,
                     "representation_mode": representation_mode,
                     "include_solution_features": include_solution_features,
+                    "include_edge_case_definitions": include_edge_case_definitions,
+                    "include_operational_guidance": include_operational_guidance,
                     "prompt": prompt,
                 }
             )
@@ -84,12 +89,13 @@ def main() -> None:
         height=15,
         include_solution_features=False,
         include_edge_case_definitions=True,
-        prompt_version="v2_definitions",
+        include_operational_guidance=True,
+        prompt_version="v3_operational",
     )
 
-    save_prompt_rows_to_csv(rows, V2_DEFINITIONS_OUTPUT_PATH)
+    save_prompt_rows_to_csv(rows, V3_OPERATIONAL_OUTPUT_PATH)
 
-    print(f"Saved {len(rows)} LLM prompts to {V2_DEFINITIONS_OUTPUT_PATH}")
+    print(f"Saved {len(rows)} LLM prompts to {V3_OPERATIONAL_OUTPUT_PATH}")
 
     print()
     print("Prompt IDs:")

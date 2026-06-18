@@ -4,10 +4,14 @@ from src.llm.prompt_builder import (
     ALLOWED_EDGE_CASE_CLASSES,
     ALLOWED_SOLVERS,
     EDGE_CASE_DEFINITIONS,
+    EDGE_CASE_OBSERVABLE_CUES,
+    SOLVER_SELECTION_GUIDANCE,
     build_prompt_for_maze,
     build_solver_selection_prompt,
     format_edge_case_definitions,
+    format_edge_case_observable_cues,
     format_feature_summary,
+    format_solver_selection_guidance,
 )
 from src.maze.edge_cases import create_greedy_trap_maze
 from src.maze.features import extract_maze_features
@@ -214,3 +218,52 @@ def test_build_prompt_for_maze_can_include_edge_case_definitions() -> None:
     assert "heuristic-deception" in prompt
     assert "GREEDY_TRAP" in prompt
     assert "expansion trap" in prompt
+
+
+def test_format_edge_case_observable_cues_contains_all_classes() -> None:
+    cues_text = format_edge_case_observable_cues()
+
+    for edge_case_class in ALLOWED_EDGE_CASE_CLASSES:
+        assert edge_case_class in cues_text
+
+        for cue in EDGE_CASE_OBSERVABLE_CUES[edge_case_class]:
+            assert cue in cues_text
+
+
+def test_format_solver_selection_guidance_contains_key_warnings() -> None:
+    guidance = format_solver_selection_guidance()
+
+    assert SOLVER_SELECTION_GUIDANCE in guidance
+    assert "do not assume they minimize node expansions" in guidance
+    assert "DFS can be fast" in guidance
+    assert "Greedy Best-First can be fast" in guidance
+    assert "prefer A*" in guidance
+
+
+def test_build_prompt_for_maze_excludes_operational_guidance_by_default() -> None:
+    maze = create_greedy_trap_maze(width=15, height=15)
+
+    prompt = build_prompt_for_maze(
+        maze,
+        representation_mode="features_ascii",
+    )
+
+    assert "Observable edge-case cues:" not in prompt
+    assert "Solver-selection guidance:" not in prompt
+
+
+def test_build_prompt_for_maze_can_include_operational_guidance() -> None:
+    maze = create_greedy_trap_maze(width=15, height=15)
+
+    prompt = build_prompt_for_maze(
+        maze,
+        representation_mode="features_ascii",
+        include_edge_case_definitions=True,
+        include_operational_guidance=True,
+    )
+
+    assert "Edge-case class definitions:" in prompt
+    assert "Observable edge-case cues:" in prompt
+    assert "Solver-selection guidance:" in prompt
+    assert "do not assume they minimize node expansions" in prompt
+    assert "A* may avoid the same mistake" in prompt
