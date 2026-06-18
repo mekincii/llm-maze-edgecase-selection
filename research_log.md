@@ -341,3 +341,156 @@ The project now separates prompt generation, response collection, response valid
   - `ascii`
   - `features_ascii`
 
+## 2026-06-18 — First Automated Ollama LLM Experiment and Result Analysis
+
+### Goal
+
+Run the first full automated local-LLM solver-selection experiment and summarize the results by model size, prompt representation, and maze family.
+
+### Work completed
+
+* Ran Ollama responses for 45 prompt/model combinations:
+
+  * 5 maze families
+  * 3 prompt representation modes
+  * 3 local Qwen3 models
+* Evaluated the generated responses using the existing LLM response-file evaluation pipeline.
+* Added `analyze_llm_results.py`.
+* Added tests for the LLM result-analysis script.
+* Confirmed that all tests pass.
+* Generated summary tables for:
+
+  * overall performance
+  * performance by model
+  * performance by representation mode
+  * performance by maze family
+  * performance by model and representation mode
+  * recommended solver counts
+  * predicted edge-case class counts
+* Committed and pushed the result-analysis script.
+
+### Main overall results
+
+The first automated experiment produced 45 evaluated LLM responses.
+
+Overall metrics:
+
+* Classification accuracy: 0.222
+* Empirical solver-selection accuracy: 0.356
+* Guarantee-aware solver-selection accuracy: 0.600
+* Shortest-path rate: 1.000
+* Quality failure rate: 0.000
+* Guarantee-aware policy violation rate: 0.000
+* Average empirical expansion regret: 41.978
+* Average guarantee-aware expansion delta: 28.778
+
+### Model-level findings
+
+The local Qwen3 models showed a clear solver-selection trend:
+
+* `qwen3:1.7b`
+
+  * Classification accuracy: 0.133
+  * Guarantee-aware solver-selection accuracy: 0.000
+  * Strongly preferred conservative but often inefficient choices such as BFS and Dijkstra.
+
+* `qwen3:4b`
+
+  * Classification accuracy: 0.333
+  * Guarantee-aware solver-selection accuracy: 0.800
+  * Often selected A*, but still misclassified several edge-case families.
+
+* `qwen3:8b`
+
+  * Classification accuracy: 0.200
+  * Guarantee-aware solver-selection accuracy: 1.000
+  * Always selected A*, giving perfect guarantee-aware solver-selection accuracy, but still failed to recognize many custom edge-case classes.
+
+### Representation-level findings
+
+The combined representation performed best overall:
+
+* `features`
+
+  * Classification accuracy: 0.200
+  * Guarantee-aware solver-selection accuracy: 0.600
+
+* `ascii`
+
+  * Classification accuracy: 0.200
+  * Guarantee-aware solver-selection accuracy: 0.533
+
+* `features_ascii`
+
+  * Classification accuracy: 0.267
+  * Guarantee-aware solver-selection accuracy: 0.667
+
+This suggests that combining structural features with ASCII layout is more useful than either representation alone, although the improvement is modest in the current prompt version.
+
+### Maze-family findings
+
+The models performed very differently across maze families:
+
+* `OPEN`
+
+  * Classification accuracy was high at 0.889.
+  * Solver-selection accuracy was lower because smaller models often selected BFS, which is safe but inefficient.
+
+* `ASTAR_TRAP`
+
+  * Classification accuracy was 0.000.
+  * Guarantee-aware solver-selection accuracy was 0.556.
+  * Models often failed to identify the heuristic-trap class, but still frequently chose safe solvers.
+
+* `DFS_TRAP`
+
+  * Classification accuracy was 0.000.
+  * Guarantee-aware solver-selection accuracy was 0.667.
+  * Models avoided risky DFS choices even when they failed to classify the trap.
+
+* `GREEDY_TRAP`
+
+  * Classification accuracy was 0.000.
+  * Guarantee-aware solver-selection accuracy was 0.667.
+  * Models usually selected A*, which is guarantee-aware correct, but did not recognize the custom Greedy-trap label.
+
+* `COMB`
+
+  * Classification accuracy was 0.222.
+  * Guarantee-aware solver-selection accuracy was 0.667.
+
+### Interpretation
+
+The first automated local-model experiment suggests that the models are weak at classifying custom edge-case labels, but much stronger at selecting reliable shortest-path solvers. This distinction is important: edge-case classification and solver recommendation are related but separate tasks.
+
+The models appear conservative. They rarely or never recommend non-guaranteed solvers such as DFS or Greedy Best-First. This leads to:
+
+* perfect shortest-path rate,
+* zero quality failures,
+* zero guarantee-aware policy violations,
+* but lower empirical solver-selection accuracy.
+
+This means the models are not good instance-optimal solver selectors yet, but they can act as conservative guarantee-aware solver selectors, especially at larger model sizes.
+
+### Methodological implication
+
+The current prompt format lists the edge-case labels but does not define them in detail. The low classification accuracy suggests that the next prompt version should include explicit definitions of:
+
+* `OPEN`
+* `COMB`
+* `ASTAR_TRAP`
+* `DFS_TRAP`
+* `GREEDY_TRAP`
+
+This will allow a second experiment comparing:
+
+* Prompt v1: label list only
+* Prompt v2: label list with definitions
+
+### Next steps
+
+* Add a prompt-definition mode or prompt versioning system.
+* Generate a second prompt dataset with explicit edge-case definitions.
+* Run the same Ollama model set on the new prompt dataset.
+* Compare v1 and v2 results to test whether explicit edge-case definitions improve classification without harming solver-selection performance.
+
