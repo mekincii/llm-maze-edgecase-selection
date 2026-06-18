@@ -1,5 +1,5 @@
+import sys
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -84,12 +84,36 @@ def print_summary(summary: dict[str, float]) -> None:
         print(f"{key}: {value:.3f}")
 
 
+def resolve_response_path_from_args() -> Path:
+    """
+    Resolve response CSV path from command-line arguments.
+
+    Usage:
+        python -m src.experiments.evaluate_llm_response_file
+        python -m src.experiments.evaluate_llm_response_file data/results/ollama_responses.csv
+
+    If no path is provided, the default response template path is used.
+    """
+    if len(sys.argv) == 1:
+        return RESPONSES_PATH
+
+    if len(sys.argv) == 2:
+        return Path(sys.argv[1])
+
+    raise ValueError(
+        "Usage: python -m src.experiments.evaluate_llm_response_file "
+        "[optional_response_csv_path]"
+    )
+
+
 def main() -> None:
+    response_path = resolve_response_path_from_args()
+
     benchmark_df = load_classical_benchmark()
-    response_rows = load_completed_response_rows(RESPONSES_PATH)
+    response_rows = load_completed_response_rows(response_path)
 
     if not response_rows:
-        print(f"No completed LLM responses found in {RESPONSES_PATH}")
+        print(f"No completed LLM responses found in {response_path}")
         print("Fill the raw_response column with JSON responses first.")
         return
 
@@ -103,6 +127,8 @@ def main() -> None:
     print("=" * 90)
     print("LLM response file evaluation")
     print("=" * 90)
+    print(f"Response file: {response_path}")
+    print()
     print(evaluation_df.to_string(index=False))
 
     summary = summarize_llm_evaluation(evaluation_df)

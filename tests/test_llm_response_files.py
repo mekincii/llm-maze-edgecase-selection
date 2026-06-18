@@ -5,6 +5,7 @@ import pytest
 
 from src.experiments.evaluate_llm_response_file import (
     load_completed_response_rows,
+    resolve_response_path_from_args,
     save_evaluation_results,
 )
 from src.experiments.generate_llm_response_template import (
@@ -167,3 +168,42 @@ def test_save_evaluation_results_rejects_empty_df(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="No evaluation rows"):
         save_evaluation_results(pd.DataFrame(), output_path)
+
+
+def test_resolve_response_path_from_args_uses_default(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        ["python -m src.experiments.evaluate_llm_response_file"],
+    )
+
+    path = resolve_response_path_from_args()
+
+    assert str(path) == "data\\prompts\\llm_responses_template.csv" or str(path) == "data/prompts/llm_responses_template.csv"
+
+
+def test_resolve_response_path_from_args_uses_provided_path(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "python -m src.experiments.evaluate_llm_response_file",
+            "data/results/ollama_responses.csv",
+        ],
+    )
+
+    path = resolve_response_path_from_args()
+
+    assert str(path) == "data\\results\\ollama_responses.csv" or str(path) == "data/results/ollama_responses.csv"
+
+
+def test_resolve_response_path_from_args_rejects_too_many_args(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "python -m src.experiments.evaluate_llm_response_file",
+            "one.csv",
+            "two.csv",
+        ],
+    )
+
+    with pytest.raises(ValueError, match="Usage"):
+        resolve_response_path_from_args()
