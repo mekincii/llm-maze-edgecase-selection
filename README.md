@@ -94,6 +94,9 @@ Each model is evaluated on:
 | `ascii`          | ASCII maze layout only.                |
 | `features_ascii` | Both feature summary and ASCII layout. |
 
+The `features` representation intentionally excludes solution-dependent quantities such as shortest-path length and shortest-path-to-Manhattan ratio. These quantities are used only for benchmark evaluation and oracle construction, not as LLM prompt inputs.
+
+
 ### Prompt versions
 
 | Version          | Description                                                       |
@@ -289,4 +292,18 @@ The project therefore supports a nuanced conclusion:
 
 ## Current status
 
-The experimental prototype is complete enough for a short IEEE-style course or seminar paper. The remaining work is mainly paper writing, figure selection, and final result presentation.
+This project is complete as a compact research-prototype and portfolio project.
+
+The implemented pipeline includes:
+
+* controlled maze edge-case generation,
+* classical pathfinding solver benchmarks,
+* structural feature extraction,
+* LLM prompt generation,
+* local Ollama response collection,
+* JSON response parsing and validation,
+* empirical and guarantee-aware solver-selection evaluation,
+* prompt-version comparison,
+* and paper-ready result figures.
+
+The project is not currently being expanded into a full research submission. Future research work would require procedurally generated maze variants, larger benchmark scale, additional model families, repeated trials, and non-LLM selector baselines.

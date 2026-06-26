@@ -661,3 +661,37 @@ Operational prompt guidance substantially improves local LLM performance as a gu
 * Draft the methodology section.
 * Draft the results and discussion sections around the v1/v2/v3 prompt ablation.
 
+## 2026-06-18 — Portfolio Project Freeze
+
+### Goal
+
+Close the project as a completed research-prototype and portfolio artifact.
+
+### Work completed
+
+* Completed the controlled maze edge-case benchmark.
+* Completed the classical solver evaluation pipeline.
+* Completed local LLM response generation with Ollama and Qwen3 models.
+* Compared three prompt versions: labels only, edge-case definitions, and operational guidance.
+* Generated summary tables and paper-ready figures.
+* Clarified that solution-dependent quantities, such as shortest-path length and shortest-path-to-Manhattan ratio, are excluded from LLM prompt features.
+* Decided to keep this project as a portfolio research prototype rather than expanding it immediately into a full publication-scale study.
+
+### Final interpretation
+
+The project supports the following compact conclusion:
+
+Local LLMs can act as conservative, guarantee-aware solver-selection assistants for controlled maze pathfinding edge cases when prompts include operational guidance. However, precise classification of custom algorithm-behavior traps remains difficult, and strong guarantee-aware performance may partly reflect conservative A* recommendation rather than fine-grained adaptive solver choice.
+
+### Portfolio status
+
+The project is complete in its current form.
+
+Future research expansion would require:
+
+* procedurally generated maze variants,
+* larger grid sizes,
+* additional local model families,
+* repeated trials,
+* non-LLM selector baselines,
+* and stronger statistical analysis.
